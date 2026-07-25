@@ -48,7 +48,7 @@ const ProductsPage = () => {
   const limit = 12;
 
   // ================================================================
-  // EFFECTS - FIXED
+  // EFFECTS - UPDATED TO USE OBJECT PARAMS
   // ================================================================
 
   useEffect(() => {
@@ -56,7 +56,12 @@ const ProductsPage = () => {
 
     const fetchData = async () => {
       if (isMounted) {
-        await dispatch(fetchProducts(style, page, limit));
+        try {
+          // ✅ Pass params as an object
+          await dispatch(fetchProducts({ style, page, limit }));
+        } catch (err) {
+          console.error("Error fetching products:", err);
+        }
       }
     };
 
@@ -65,7 +70,7 @@ const ProductsPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [dispatch, style, page, limit]); // ← Correct dependencies
+  }, [dispatch, style, page, limit]);
 
   // ================================================================
   // FILTER PRODUCTS
@@ -94,10 +99,13 @@ const ProductsPage = () => {
   if (error) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
+        <div className="text-red-500 text-5xl mb-4">⚠️</div>
+        <h2 className="text-2xl font-bold text-red-600 mb-4">
+          Error Loading Products
+        </h2>
         <p className="text-gray-600">{error}</p>
         <button
-          onClick={() => dispatch(fetchProducts(style, page, limit))}
+          onClick={() => dispatch(fetchProducts({ style, page, limit }))}
           className="mt-4 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
         >
           Try Again
@@ -129,7 +137,9 @@ const ProductsPage = () => {
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
         <h1 className="text-3xl md:text-4xl font-akira-super text-gray-800">
-          {style ? `${style} Products` : "All Products"}
+          {style
+            ? `${style.charAt(0).toUpperCase() + style.slice(1)} Products`
+            : "All Products"}
         </h1>
         <p className="text-gray-500 text-sm mt-2 md:mt-0">
           {filteredProducts.length} products found
