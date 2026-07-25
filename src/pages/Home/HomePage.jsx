@@ -61,10 +61,10 @@ function HomePage() {
     }
   }, [dispatch, hasFetched, loading]);
 
-  // ✅ Fetch Top Selling products using the hook
+  // ✅ Fetch Top Selling products ONCE when component mounts
   useEffect(() => {
     fetchTopSelling(4);
-  }, [fetchTopSelling]);
+  }, []); // ← FIXED: Empty dependency array
 
   // ================================================================
   // LOADING STATES
