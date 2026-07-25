@@ -4,14 +4,15 @@
 
 import axios from "axios";
 
-const API_URL =  "https://shop-co-e-commerce-backend.onrender.com/api/v1";
+const API_URL = "https://shop-co-e-commerce-backend.onrender.com/api/v1";
 
 // ================================================================
-// GET PRODUCTS (WITH PAGINATION)
+// GET PRODUCTS (WITH PAGINATION) - FIXED
 // ================================================================
 
 const getProducts = async (style = "", page = 1, limit = 12) => {
-  let url = `${API_URL}?page=${page}&limit=${limit}`;
+  // ✅ Added /products to the URL
+  let url = `${API_URL}/products?page=${page}&limit=${limit}`;
 
   if (style) {
     url += `&style=${style}`;
@@ -22,11 +23,14 @@ const getProducts = async (style = "", page = 1, limit = 12) => {
 };
 
 // ================================================================
-// GET TOP SELLING PRODUCTS (NEW)
+// GET TOP SELLING PRODUCTS
 // ================================================================
 
 const getTopSelling = async (limit = 4) => {
-  const response = await axios.get(`${API_URL}/top-selling?limit=${limit}`);
+  // ✅ This one is correct - uses /top-selling
+  const response = await axios.get(
+    `${API_URL}/products/top-selling?limit=${limit}`,
+  );
   return response.data;
 };
 
@@ -35,7 +39,8 @@ const getTopSelling = async (limit = 4) => {
 // ================================================================
 
 const getSingleProduct = async (id) => {
-  const response = await axios.get(`${API_URL}/${id}`);
+  // ✅ This one is correct - uses /:id
+  const response = await axios.get(`${API_URL}/products/${id}`);
   return response.data;
 };
 
@@ -44,7 +49,7 @@ const getSingleProduct = async (id) => {
 // ================================================================
 
 const getProductReviews = async (productId) => {
-  const response = await axios.get(`${API_URL}/${productId}/reviews`);
+  const response = await axios.get(`${API_URL}/products/${productId}/reviews`);
   return response.data;
 };
 
@@ -54,7 +59,7 @@ const getProductReviews = async (productId) => {
 
 const submitReview = async (productId, reviewData, token) => {
   const response = await axios.post(
-    `${API_URL}/${productId}/reviews`,
+    `${API_URL}/products/${productId}/reviews`,
     reviewData,
     {
       headers: {
@@ -72,7 +77,7 @@ const submitReview = async (productId, reviewData, token) => {
 
 const deleteReview = async (productId, reviewId, token) => {
   const response = await axios.delete(
-    `${API_URL}/${productId}/reviews/${reviewId}`,
+    `${API_URL}/products/${productId}/reviews/${reviewId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -88,7 +93,7 @@ const deleteReview = async (productId, reviewId, token) => {
 
 const updateReview = async (productId, reviewId, reviewData, token) => {
   const response = await axios.put(
-    `${API_URL}/${productId}/reviews/${reviewId}`,
+    `${API_URL}/products/${productId}/reviews/${reviewId}`,
     reviewData,
     {
       headers: {
