@@ -10,12 +10,10 @@ import productService from "../../services/productService";
 // ================================================================
 
 export const fetchProducts = createAsyncThunk(
-  'product/fetchProducts',
-  async ({ style = '', page = 1, limit = 12 }, { rejectWithValue }) => {
+  "product/fetchProducts",
+  async ({ style = "", page = 1, limit = 12 }, { rejectWithValue }) => {
     try {
       const response = await productService.getProducts(style, page, limit);
-      
-      // ✅ CORRECT: response.data contains the products array
       return {
         data: response.data || [],
         totalProducts: response.totalProducts || 0,
@@ -26,24 +24,28 @@ export const fetchProducts = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || 'Failed to fetch products'
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to fetch products",
       );
     }
-  }
+  },
 );
 
 export const fetchSingleProduct = createAsyncThunk(
-  'product/fetchSingleProduct',
+  "product/fetchSingleProduct",
   async (id, { rejectWithValue }) => {
     try {
       const response = await productService.getSingleProduct(id);
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || 'Failed to fetch product'
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to fetch product",
       );
     }
-  }
+  },
 );
 
 export const submitReview = createAsyncThunk(
@@ -132,7 +134,7 @@ const initialState = {
   totalProducts: 0,
   totalPages: 1,
   currentPage: 1,
-  productsPerPage: 10,
+  productsPerPage: 12,
 };
 
 // ================================================================
@@ -157,25 +159,27 @@ const productSlice = createSlice({
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.hasFetched = false;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
         state.products = action.payload.data || [];
-        state.totalProducts = action.payload.totalProducts;
-        state.totalPages = action.payload.totalPages;
-        state.currentPage = action.payload.currentPage;
-        state.productsPerPage = action.payload.productsPerPage;
+        state.totalProducts = action.payload.totalProducts || 0;
+        state.totalPages = action.payload.totalPages || 1;
+        state.currentPage = action.payload.currentPage || 1;
+        state.productsPerPage = action.payload.productsPerPage || 12;
         state.hasFetched = true;
         state.error = null;
+        console.log("✅ Products loaded:", state.products.length);
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to fetch products";
         state.hasFetched = false;
         state.products = [];
+        console.log("❌ Products fetch failed:", action.payload);
       })
-      
-      // ✅ fetchSingleProduct
+
       .addCase(fetchSingleProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -191,8 +195,7 @@ const productSlice = createSlice({
         state.error = action.payload;
         state.productDetails = null;
       })
-      
-      // ✅ submitReview
+
       .addCase(submitReview.pending, (state) => {
         state.reviewLoading = true;
         state.reviewSuccess = false;
@@ -210,8 +213,7 @@ const productSlice = createSlice({
         state.reviewSuccess = false;
         state.error = action.payload;
       })
-      
-      // ✅ fetchProductReviews
+
       .addCase(fetchProductReviews.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -225,8 +227,7 @@ const productSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
-      // ✅ deleteReview
+
       .addCase(deleteReview.pending, (state) => {
         state.reviewLoading = true;
         state.error = null;
