@@ -5,12 +5,10 @@
 import axios from "axios";
 
 // ================================================================
-// API BASE URL
+// API BASE URL - HARDCODED FOR PRODUCTION
 // ================================================================
-console.log("🔍 Environment Variables:", import.meta.env);
-console.log("🔍 VITE_API_URL:", import.meta.env.VITE_API_URL);
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3003/api/v1";
+// ✅ Hardcoded to your Render backend
+const API_URL = "https://shopco-backend.onrender.com/api/v1";
 
 console.log("🔍 Using API_URL:", API_URL);
 
