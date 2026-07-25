@@ -5,12 +5,11 @@
 import axios from "axios";
 
 // ================================================================
-// API BASE URL - WITH DEBUG LOGGING
+// API BASE URL
 // ================================================================
 console.log("🔍 Environment Variables:", import.meta.env);
 console.log("🔍 VITE_API_URL:", import.meta.env.VITE_API_URL);
 
-// ✅ Use environment variable or fallback
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3003/api/v1";
 
 console.log("🔍 Using API_URL:", API_URL);
@@ -25,4 +24,36 @@ const api = axios.create({
   },
 });
 
-// ... rest of your code stays the same
+// ================================================================
+// REQUEST INTERCEPTOR - Add token to every request
+// ================================================================
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
+// ================================================================
+// RESPONSE INTERCEPTOR - Handle errors globally
+// ================================================================
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle 401 Unauthorized - Redirect to login
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  },
+);
+
+// ✅ Make sure this is at the end of the file
+export default api;
