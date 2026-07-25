@@ -51,7 +51,7 @@ const Layout = () => {
     <>
       <CustomToaster />
       <Navbar />
-      <ScrollRestoration /> {/* Now works with data router */}
+      <ScrollRestoration />
       <Outlet />
       <Footer />
     </>
@@ -70,6 +70,7 @@ const router = createBrowserRouter([
       { path: "/forgot-password", element: <ForgotPasswordPage /> },
       { path: "/reset-password", element: <ResetPasswordPage /> },
       { path: "/reset-password/:token", element: <ResetPasswordPage /> },
+      // ✅ ADD THIS MISSING ROUTE:
       { path: "/products", element: <ProductsPage /> },
       { path: "/products/:id", element: <ProductDetailsPage /> },
       { path: "/about", element: <AboutPage /> },
