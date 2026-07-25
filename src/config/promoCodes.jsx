@@ -1,0 +1,65 @@
+// src/config/promoCodes.js
+
+export const promoCodes = [
+  {
+    code: "SAVE20",
+    discount: 20,
+    type: "percentage",
+    description: "20% off your entire order",
+    expiresAt: null, // null = never expires
+    minOrder: 50,
+    maxDiscount: 100,
+  },
+  {
+    code: "SAVE50",
+    discount: 50,
+    type: "percentage",
+    description: "50% off your entire order",
+    expiresAt: null,
+    minOrder: 100,
+    maxDiscount: 200,
+  },
+  {
+    code: "FREESHIP",
+    discount: 0,
+    type: "free_shipping",
+    description: "Free shipping on your order",
+    expiresAt: null,
+    minOrder: 30,
+  },
+  {
+    code: "WELCOME10",
+    discount: 10,
+    type: "percentage",
+    description: "10% off your first order",
+    expiresAt: null,
+    minOrder: 0,
+    maxDiscount: 50,
+  },
+  {
+    code: "FLAT50",
+    discount: 50,
+    type: "fixed",
+    description: "$50 off your order",
+    expiresAt: null,
+    minOrder: 200,
+  },
+  {
+    code: "SUMMER25",
+    discount: 25,
+    type: "percentage",
+    description: "25% off summer collection",
+    expiresAt: "2026-08-31",
+    minOrder: 75,
+    maxDiscount: 150,
+  },
+  {
+    code: "BLACKFRIDAY",
+    discount: 30,
+    type: "percentage",
+    description: "30% off Black Friday sale",
+    expiresAt: "2026-11-30",
+    minOrder: 150,
+    maxDiscount: 300,
+  },
+];

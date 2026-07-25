@@ -1,0 +1,35 @@
+/* index.css */
+@import "tailwindcss";
+
+/*  Super Bold - Separate font family */
+@font-face {
+  font-family: "Akira-Super";
+  src: url("/fonts/Akira-Expanded-Super-Bold.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*  Bold - Separate font family */
+@font-face {
+  font-family: "Akira-Bold";
+  src: url("/fonts/Akira-Expanded-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*  Register custom fonts with Tailwind v4 */
+@theme {
+  --font-family-akira-super: "Akira-Super", sans-serif;
+  --font-family-akira-bold: "Akira-Bold", sans-serif;
+}
+
+/*  Create utility classes */
+@utility font-akira-super {
+  font-family: "Akira-Super", sans-serif;
+}
+
+@utility font-akira-bold {
+  font-family: "Akira-Bold", sans-serif;
+}
