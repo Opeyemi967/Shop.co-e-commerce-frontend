@@ -48,7 +48,7 @@ const ProductsPage = () => {
   const limit = 12;
 
   // ================================================================
-  // EFFECTS - UPDATED TO USE OBJECT PARAMS
+  // EFFECTS - FIXED
   // ================================================================
 
   useEffect(() => {
@@ -57,7 +57,6 @@ const ProductsPage = () => {
     const fetchData = async () => {
       if (isMounted) {
         try {
-          // ✅ Pass params as an object
           await dispatch(fetchProducts({ style, page, limit }));
         } catch (err) {
           console.error("Error fetching products:", err);
@@ -208,7 +207,6 @@ const ProductsPage = () => {
       {/* ============================================================ */}
 
       {filteredProducts.length === 0 ? (
-        // Empty State
         <div className="text-center py-16">
           <h3 className="text-2xl font-bold text-gray-700 mb-2">
             No Products Found
@@ -227,7 +225,6 @@ const ProductsPage = () => {
           </button>
         </div>
       ) : (
-        //  Products Grid
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
             <ProductCard key={product._id} product={product} />

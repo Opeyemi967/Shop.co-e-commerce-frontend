@@ -16,7 +16,7 @@ export const fetchProducts = createAsyncThunk(
     try {
       const response = await productService.getProducts(style, page, limit);
       return {
-        data: response.data,
+        data: response.data || [],
         totalProducts: response.totalProducts || response.data?.length || 0,
         totalPages: response.totalPages || 1,
         currentPage: response.page || page,
@@ -49,7 +49,75 @@ export const fetchSingleProduct = createAsyncThunk(
   },
 );
 
-// ... other thunks (submitReview, fetchProductReviews, deleteReview) remain the same
+export const submitReview = createAsyncThunk(
+  "product/submitReview",
+  async ({ productId, rating, comment, userName }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        return rejectWithValue("Please login to submit a review");
+      }
+
+      const response = await productService.submitReview(
+        productId,
+        { rating, comment, userName },
+        token,
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to submit review. Please try again.",
+      );
+    }
+  },
+);
+
+export const fetchProductReviews = createAsyncThunk(
+  "product/fetchProductReviews",
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await productService.getProductReviews(productId);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to fetch reviews",
+      );
+    }
+  },
+);
+
+export const deleteReview = createAsyncThunk(
+  "product/deleteReview",
+  async ({ productId, reviewId }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        return rejectWithValue("Please login to delete a review");
+      }
+
+      const response = await productService.deleteReview(
+        productId,
+        reviewId,
+        token,
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to delete review",
+      );
+    }
+  },
+);
 
 // ================================================================
 // INITIAL STATE
@@ -108,6 +176,7 @@ const productSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.hasFetched = false;
+        state.products = [];
       })
 
       // ✅ fetchSingleProduct
@@ -124,9 +193,58 @@ const productSlice = createSlice({
       .addCase(fetchSingleProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+        state.productDetails = null;
+      })
 
-    // ... other reducers (submitReview, fetchProductReviews, deleteReview) remain the same
+      // ✅ submitReview
+      .addCase(submitReview.pending, (state) => {
+        state.reviewLoading = true;
+        state.reviewSuccess = false;
+        state.error = null;
+      })
+      .addCase(submitReview.fulfilled, (state, action) => {
+        state.reviewLoading = false;
+        state.reviewSuccess = true;
+        state.productDetails = action.payload;
+        state.reviews = action.payload.reviews || [];
+        state.error = null;
+      })
+      .addCase(submitReview.rejected, (state, action) => {
+        state.reviewLoading = false;
+        state.reviewSuccess = false;
+        state.error = action.payload;
+      })
+
+      // ✅ fetchProductReviews
+      .addCase(fetchProductReviews.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProductReviews.fulfilled, (state, action) => {
+        state.loading = false;
+        state.reviews = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchProductReviews.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // ✅ deleteReview
+      .addCase(deleteReview.pending, (state) => {
+        state.reviewLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteReview.fulfilled, (state, action) => {
+        state.reviewLoading = false;
+        state.productDetails = action.payload;
+        state.reviews = action.payload.reviews || [];
+        state.error = null;
+      })
+      .addCase(deleteReview.rejected, (state, action) => {
+        state.reviewLoading = false;
+        state.error = action.payload;
+      });
   },
 });
 
