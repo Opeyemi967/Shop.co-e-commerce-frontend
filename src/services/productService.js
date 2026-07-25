@@ -16,18 +16,17 @@ const getProducts = async (style = "", page = 1, limit = 12) => {
     url += `&style=${style}`;
   }
 
-  console.log("🔍 Fetching products from:", url);
+  console.log("🔍 Making API request to:", url);
 
-  // ✅ Add token if available
-  const token = localStorage.getItem("token");
-  const headers = {};
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
+  try {
+    const response = await axios.get(url);
+    console.log("🔍 API Response status:", response.status);
+    console.log("🔍 API Response data:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("❌ API Error:", error);
+    throw error;
   }
-
-  const response = await axios.get(url, { headers });
-  console.log("🔍 Products response:", response.data);
-  return response.data;
 };
 
 // ================================================================
@@ -36,15 +35,13 @@ const getProducts = async (style = "", page = 1, limit = 12) => {
 
 const getTopSelling = async (limit = 4) => {
   const url = `${API_URL}/products/top-selling?limit=${limit}`;
-  
-  const token = localStorage.getItem("token");
-  const headers = {};
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("❌ Top selling error:", error);
+    throw error;
   }
-
-  const response = await axios.get(url, { headers });
-  return response.data;
 };
 
 // ================================================================
@@ -53,15 +50,13 @@ const getTopSelling = async (limit = 4) => {
 
 const getSingleProduct = async (id) => {
   const url = `${API_URL}/products/${id}`;
-  
-  const token = localStorage.getItem("token");
-  const headers = {};
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("❌ Single product error:", error);
+    throw error;
   }
-
-  const response = await axios.get(url, { headers });
-  return response.data;
 };
 
 // ================================================================
@@ -69,8 +64,15 @@ const getSingleProduct = async (id) => {
 // ================================================================
 
 const getProductReviews = async (productId) => {
-  const response = await axios.get(`${API_URL}/products/${productId}/reviews`);
-  return response.data;
+  try {
+    const response = await axios.get(
+      `${API_URL}/products/${productId}/reviews`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("❌ Get reviews error:", error);
+    throw error;
+  }
 };
 
 // ================================================================
@@ -78,17 +80,22 @@ const getProductReviews = async (productId) => {
 // ================================================================
 
 const submitReview = async (productId, reviewData, token) => {
-  const response = await axios.post(
-    `${API_URL}/products/${productId}/reviews`,
-    reviewData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+  try {
+    const response = await axios.post(
+      `${API_URL}/products/${productId}/reviews`,
+      reviewData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
-  return response.data;
+    );
+    return response.data;
+  } catch (error) {
+    console.error("❌ Submit review error:", error);
+    throw error;
+  }
 };
 
 // ================================================================
@@ -96,15 +103,20 @@ const submitReview = async (productId, reviewData, token) => {
 // ================================================================
 
 const deleteReview = async (productId, reviewId, token) => {
-  const response = await axios.delete(
-    `${API_URL}/products/${productId}/reviews/${reviewId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
+  try {
+    const response = await axios.delete(
+      `${API_URL}/products/${productId}/reviews/${reviewId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    },
-  );
-  return response.data;
+    );
+    return response.data;
+  } catch (error) {
+    console.error("❌ Delete review error:", error);
+    throw error;
+  }
 };
 
 // ================================================================
@@ -112,17 +124,22 @@ const deleteReview = async (productId, reviewId, token) => {
 // ================================================================
 
 const updateReview = async (productId, reviewId, reviewData, token) => {
-  const response = await axios.put(
-    `${API_URL}/products/${productId}/reviews/${reviewId}`,
-    reviewData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+  try {
+    const response = await axios.put(
+      `${API_URL}/products/${productId}/reviews/${reviewId}`,
+      reviewData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
-  return response.data;
+    );
+    return response.data;
+  } catch (error) {
+    console.error("❌ Update review error:", error);
+    throw error;
+  }
 };
 
 // ================================================================
