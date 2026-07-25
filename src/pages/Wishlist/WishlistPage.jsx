@@ -16,7 +16,7 @@ import { HiShoppingCart } from "react-icons/hi";
 // ================================================================
 // IMPORT TOAST MESSAGES FROM CONFIG
 // ================================================================
-import { toastMessages } from "../../lib/toast";
+import { toastMessages } from "../../lib/Toast";
 
 // ==============================================
 // WISHLIST PAGE

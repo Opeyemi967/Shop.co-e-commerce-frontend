@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { submitReview, resetReviewState } from "../redux/slices/productSlice";
-import { toastMessages } from "../lib/toastConfig";
+import { toastMessages } from "../lib/Toast";
 
 export const useReviews = (productId) => {
   const dispatch = useDispatch();
