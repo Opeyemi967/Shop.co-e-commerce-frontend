@@ -13,9 +13,23 @@ export const fetchProducts = createAsyncThunk(
   'product/fetchProducts',
   async ({ style = '', page = 1, limit = 12 }, { rejectWithValue }) => {
     try {
+      console.log("🔄 fetchProducts called with:", { style, page, limit });
+      
       const response = await productService.getProducts(style, page, limit);
       
-      console.log("🔍 fetchProducts response:", response);
+      console.log("🔄 fetchProducts response:", response);
+      
+      // ✅ Check if response is valid
+      if (!response) {
+        console.error("❌ No response from API");
+        return rejectWithValue("No response from server");
+      }
+      
+      // ✅ Check if response has data
+      if (!response.data) {
+        console.error("❌ No data in response:", response);
+        return rejectWithValue("No data in response");
+      }
       
       return {
         data: response.data || [],
@@ -27,9 +41,25 @@ export const fetchProducts = createAsyncThunk(
       };
     } catch (error) {
       console.error("❌ fetchProducts error:", error);
-      return rejectWithValue(
-        error.response?.data?.message || error.message || 'Failed to fetch products'
-      );
+      
+      // ✅ Get the actual error message
+      let errorMessage = "Failed to fetch products";
+      
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
+        console.error("❌ Server responded with error:", error.response.status, error.response.data);
+      } else if (error.request) {
+        // The request was made but no response was received
+        errorMessage = "No response from server. Please check your connection.";
+        console.error("❌ No response from server:", error.request);
+      } else {
+        // Something happened in setting up the request
+        errorMessage = error.message || "Failed to fetch products";
+        console.error("❌ Request error:", error.message);
+      }
+      
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -41,6 +71,7 @@ export const fetchSingleProduct = createAsyncThunk(
       const response = await productService.getSingleProduct(id);
       return response.data;
     } catch (error) {
+      console.error("❌ fetchSingleProduct error:", error);
       return rejectWithValue(
         error.response?.data?.message || error.message || 'Failed to fetch product'
       );
@@ -66,6 +97,7 @@ export const submitReview = createAsyncThunk(
 
       return response.data;
     } catch (error) {
+      console.error("❌ submitReview error:", error);
       return rejectWithValue(
         error.response?.data?.message ||
           error.message ||
@@ -82,6 +114,7 @@ export const fetchProductReviews = createAsyncThunk(
       const response = await productService.getProductReviews(productId);
       return response.data;
     } catch (error) {
+      console.error("❌ fetchProductReviews error:", error);
       return rejectWithValue(
         error.response?.data?.message ||
           error.message ||
@@ -109,6 +142,7 @@ export const deleteReview = createAsyncThunk(
 
       return response.data;
     } catch (error) {
+      console.error("❌ deleteReview error:", error);
       return rejectWithValue(
         error.response?.data?.message ||
           error.message ||
@@ -156,10 +190,12 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // ✅ fetchProducts
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.hasFetched = false;
+        console.log("🔄 fetchProducts pending...");
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
@@ -180,6 +216,7 @@ const productSlice = createSlice({
         console.error("❌ Products fetch failed:", action.payload);
       })
       
+      // ✅ fetchSingleProduct
       .addCase(fetchSingleProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -196,6 +233,7 @@ const productSlice = createSlice({
         state.productDetails = null;
       })
       
+      // ✅ submitReview
       .addCase(submitReview.pending, (state) => {
         state.reviewLoading = true;
         state.reviewSuccess = false;
@@ -214,6 +252,7 @@ const productSlice = createSlice({
         state.error = action.payload;
       })
       
+      // ✅ fetchProductReviews
       .addCase(fetchProductReviews.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -228,6 +267,7 @@ const productSlice = createSlice({
         state.error = action.payload;
       })
       
+      // ✅ deleteReview
       .addCase(deleteReview.pending, (state) => {
         state.reviewLoading = true;
         state.error = null;
