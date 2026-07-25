@@ -54,12 +54,12 @@ function HomePage() {
     execute: fetchTopSelling,
   } = useApi(productService.getTopSelling);
 
-  // ✅ Fetch all products if not loaded
+  // ✅ Fetch products ONLY ONCE when component mounts and not already fetched
   useEffect(() => {
     if (!hasFetched && !loading) {
       dispatch(fetchProducts());
     }
-  }, [dispatch, hasFetched, loading]);
+  }, []); // ← FIXED: Empty dependency array to run ONCE
 
   // ✅ Fetch Top Selling products ONCE when component mounts
   useEffect(() => {

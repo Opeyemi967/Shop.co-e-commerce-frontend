@@ -1,25 +1,42 @@
 // ================================================================
-// PRODUCT SERVICE WITH PAGINATION & TOP SELLING
+// PRODUCT SERVICE WITH REQUEST DEDUPLICATION
 // ================================================================
 
 import axios from "axios";
 
 const API_URL = "https://shop-co-e-commerce-backend.onrender.com/api/v1";
 
+// ✅ Pending request cache to prevent duplicates
+const pendingRequests = new Map();
+
 // ================================================================
-// GET PRODUCTS (WITH PAGINATION) - FIXED
+// GET PRODUCTS (WITH PAGINATION)
 // ================================================================
 
 const getProducts = async (style = "", page = 1, limit = 12) => {
-  // ✅ Added /products to the URL
-  let url = `${API_URL}/products?page=${page}&limit=${limit}`;
+  const cacheKey = `products_${style}_${page}_${limit}`;
 
+  // If a request with this key is already in progress, return its promise
+  if (pendingRequests.has(cacheKey)) {
+    console.log("⏳ Deduplicating request:", cacheKey);
+    return pendingRequests.get(cacheKey);
+  }
+
+  let url = `${API_URL}/products?page=${page}&limit=${limit}`;
   if (style) {
     url += `&style=${style}`;
   }
 
-  const response = await axios.get(url);
-  return response.data;
+  console.log("🔄 Making request:", cacheKey);
+  const requestPromise = axios.get(url).then((res) => res.data);
+  pendingRequests.set(cacheKey, requestPromise);
+
+  try {
+    const result = await requestPromise;
+    return result;
+  } finally {
+    pendingRequests.delete(cacheKey);
+  }
 };
 
 // ================================================================
@@ -27,11 +44,25 @@ const getProducts = async (style = "", page = 1, limit = 12) => {
 // ================================================================
 
 const getTopSelling = async (limit = 4) => {
-  // ✅ This one is correct - uses /top-selling
-  const response = await axios.get(
-    `${API_URL}/products/top-selling?limit=${limit}`,
-  );
-  return response.data;
+  const cacheKey = `topSelling_${limit}`;
+
+  if (pendingRequests.has(cacheKey)) {
+    console.log("⏳ Deduplicating request:", cacheKey);
+    return pendingRequests.get(cacheKey);
+  }
+
+  console.log("🔄 Making request:", cacheKey);
+  const requestPromise = axios
+    .get(`${API_URL}/products/top-selling?limit=${limit}`)
+    .then((res) => res.data);
+  pendingRequests.set(cacheKey, requestPromise);
+
+  try {
+    const result = await requestPromise;
+    return result;
+  } finally {
+    pendingRequests.delete(cacheKey);
+  }
 };
 
 // ================================================================
@@ -39,9 +70,25 @@ const getTopSelling = async (limit = 4) => {
 // ================================================================
 
 const getSingleProduct = async (id) => {
-  // ✅ This one is correct - uses /:id
-  const response = await axios.get(`${API_URL}/products/${id}`);
-  return response.data;
+  const cacheKey = `singleProduct_${id}`;
+
+  if (pendingRequests.has(cacheKey)) {
+    console.log("⏳ Deduplicating request:", cacheKey);
+    return pendingRequests.get(cacheKey);
+  }
+
+  console.log("🔄 Making request:", cacheKey);
+  const requestPromise = axios
+    .get(`${API_URL}/products/${id}`)
+    .then((res) => res.data);
+  pendingRequests.set(cacheKey, requestPromise);
+
+  try {
+    const result = await requestPromise;
+    return result;
+  } finally {
+    pendingRequests.delete(cacheKey);
+  }
 };
 
 // ================================================================

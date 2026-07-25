@@ -48,12 +48,24 @@ const ProductsPage = () => {
   const limit = 12;
 
   // ================================================================
-  // EFFECTS
+  // EFFECTS - FIXED
   // ================================================================
 
   useEffect(() => {
-    dispatch(fetchProducts(style, page, limit));
-  }, [dispatch, style, page, limit]);
+    let isMounted = true;
+
+    const fetchData = async () => {
+      if (isMounted) {
+        await dispatch(fetchProducts(style, page, limit));
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dispatch, style, page, limit]); // ← Correct dependencies
 
   // ================================================================
   // FILTER PRODUCTS
