@@ -39,7 +39,7 @@ import AdminOrderDetails from "./pages/Admin/AdminOrderDetails";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import PaymentVerificationPage from "./pages/PaymentVerificationPage";
 
-// ✅ REMOVED fetchProducts from here
+// Redux Actions
 import { getCurrentUser } from "./redux/slices/authSlice";
 import { fetchCart, clearCart } from "./redux/slices/cartSlice";
 import { fetchWishlist, clearWishlist } from "./redux/slices/wishlistSlice";
@@ -69,7 +69,7 @@ const router = createBrowserRouter([
       { path: "/forgot-password", element: <ForgotPasswordPage /> },
       { path: "/reset-password", element: <ResetPasswordPage /> },
       { path: "/reset-password/:token", element: <ResetPasswordPage /> },
-      { path: "/products", element: <ProductsPage /> },
+      { path: "/products", element: <ProductsPage /> }, // ✅ ADDED
       { path: "/products/:id", element: <ProductDetailsPage /> },
       { path: "/about", element: <AboutPage /> },
       { path: "/contact", element: <ContactPage /> },
@@ -178,9 +178,7 @@ function App() {
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
 
-  // ✅ REMOVED the fetchProducts useEffect
-
-  // ✅ Fetch user data if authenticated
+  // Fetch user data if authenticated
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -193,7 +191,7 @@ function App() {
     }
   }, [isAuthenticated, dispatch]);
 
-  // ✅ Fetch current user on app load
+  // Fetch current user on app load
   useEffect(() => {
     const token = localStorage.getItem("token");
 
