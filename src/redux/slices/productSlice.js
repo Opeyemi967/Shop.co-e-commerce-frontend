@@ -9,44 +9,41 @@ import productService from "../../services/productService";
 // ASYNC THUNKS
 // ================================================================
 
-// ✅ FIXED: fetchProducts using createAsyncThunk
 export const fetchProducts = createAsyncThunk(
-  "product/fetchProducts",
-  async ({ style = "", page = 1, limit = 12 }, { rejectWithValue }) => {
+  'product/fetchProducts',
+  async ({ style = '', page = 1, limit = 12 }, { rejectWithValue }) => {
     try {
       const response = await productService.getProducts(style, page, limit);
+      
+      // ✅ CORRECT: response.data contains the products array
       return {
         data: response.data || [],
-        totalProducts: response.totalProducts || response.data?.length || 0,
+        totalProducts: response.totalProducts || 0,
         totalPages: response.totalPages || 1,
         currentPage: response.page || page,
         productsPerPage: limit,
-        count: response.count || response.data?.length || 0,
+        count: response.count || 0,
       };
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          error.message ||
-          "Failed to fetch products",
+        error.response?.data?.message || error.message || 'Failed to fetch products'
       );
     }
-  },
+  }
 );
 
 export const fetchSingleProduct = createAsyncThunk(
-  "product/fetchSingleProduct",
+  'product/fetchSingleProduct',
   async (id, { rejectWithValue }) => {
     try {
       const response = await productService.getSingleProduct(id);
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          error.message ||
-          "Failed to fetch product",
+        error.response?.data?.message || error.message || 'Failed to fetch product'
       );
     }
-  },
+  }
 );
 
 export const submitReview = createAsyncThunk(
@@ -157,7 +154,6 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ✅ fetchProducts
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -178,7 +174,7 @@ const productSlice = createSlice({
         state.hasFetched = false;
         state.products = [];
       })
-
+      
       // ✅ fetchSingleProduct
       .addCase(fetchSingleProduct.pending, (state) => {
         state.loading = true;
@@ -195,7 +191,7 @@ const productSlice = createSlice({
         state.error = action.payload;
         state.productDetails = null;
       })
-
+      
       // ✅ submitReview
       .addCase(submitReview.pending, (state) => {
         state.reviewLoading = true;
@@ -214,7 +210,7 @@ const productSlice = createSlice({
         state.reviewSuccess = false;
         state.error = action.payload;
       })
-
+      
       // ✅ fetchProductReviews
       .addCase(fetchProductReviews.pending, (state) => {
         state.loading = true;
@@ -229,7 +225,7 @@ const productSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
+      
       // ✅ deleteReview
       .addCase(deleteReview.pending, (state) => {
         state.reviewLoading = true;
