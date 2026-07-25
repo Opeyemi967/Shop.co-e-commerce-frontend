@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
 import { addToCart } from "../../redux/slices/cartSlice";
 import { addToWishlist } from "../../redux/slices/wishlistSlice";
-import { toastMessages } from "../../lib/toast";
+import { toastMessages } from "../../lib/Toast";
 import ProtectedAction from "../common/ProtectedAction";
 
 const ProductActions = ({

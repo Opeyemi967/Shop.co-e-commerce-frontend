@@ -16,7 +16,7 @@ import { MdChevronRight } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
 import { FiArrowRight } from "react-icons/fi";
 import { HiOutlineTicket } from "react-icons/hi";
-import { toastMessages } from "../../lib/toast";
+import { toastMessages } from "../../lib/Toast";
 
 function CartPage() {
   const dispatch = useDispatch();
