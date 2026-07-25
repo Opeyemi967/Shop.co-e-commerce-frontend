@@ -1,8 +1,6 @@
 // src/pages/ProductsPage.jsx
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts } from "../redux/slices/productSlice";
 import ProductCard from "../components/product/ProductCard";
 import Breadcrumb from "../components/common/Breadcrumb";
 import { FaChevronDown } from "react-icons/fa";
@@ -10,42 +8,64 @@ import Pagination from "../components/common/Pagination";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 
 const ProductsPage = () => {
-  const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
-
-  const {
-    products,
-    loading,
-    error,
-    totalProducts,
-    totalPages,
-    currentPage,
-    productsPerPage,
-  } = useSelector((state) => state.product);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const style = searchParams.get("style") || "";
   const page = parseInt(searchParams.get("page")) || 1;
   const limit = 12;
 
+  // ✅ DIRECT API CALL - NO REDUX
   useEffect(() => {
-    console.log("🔄 Fetching products...");
-    dispatch(fetchProducts({ style, page, limit }));
-  }, [dispatch, style, page, limit]);
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  // ✅ DEBUG: Log the state
-  console.log("🔍 Products in Redux:", products);
-  console.log("🔍 Loading:", loading);
-  console.log("🔍 Error:", error);
-  console.log("🔍 Total Products:", totalProducts);
+        let url = `https://shop-co-e-commerce-backend.onrender.com/api/v1/products?page=${page}&limit=${limit}`;
+        if (style) {
+          url += `&style=${style}`;
+        }
 
-  // ✅ If there are products, show them immediately (don't wait for loading)
-  if (products && products.length > 0) {
-    // Show products immediately
-  }
+        console.log("📡 FETCHING:", url);
 
-  // ✅ Show loading only if loading is true AND no products yet
-  if (loading && products.length === 0) {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        console.log("📡 DATA:", data);
+
+        if (data.success) {
+          setProducts(data.data || []);
+          setTotalProducts(data.totalProducts || 0);
+          setTotalPages(data.totalPages || 1);
+          setCurrentPage(data.page || page);
+        } else {
+          setError(data.message || "Failed to fetch products");
+        }
+      } catch (err) {
+        console.error("❌ ERROR:", err);
+        setError(err.message || "Failed to fetch products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [style, page, limit]);
+
+  // Filter products by search term
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  // Loading state
+  if (loading) {
     return (
       <div className="flex justify-center items-center min-h-100">
         <LoadingSpinner size="lg" text="Loading products..." />
@@ -53,13 +73,14 @@ const ProductsPage = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
         <p className="text-gray-600">{error}</p>
         <button
-          onClick={() => dispatch(fetchProducts({ style, page, limit }))}
+          onClick={() => window.location.reload()}
           className="mt-4 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
         >
           Try Again
@@ -67,10 +88,6 @@ const ProductsPage = () => {
       </div>
     );
   }
-
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-8">
@@ -92,7 +109,6 @@ const ProductsPage = () => {
         </p>
       </div>
 
-      {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
         <div className="flex-1">
           <input
@@ -172,7 +188,7 @@ const ProductsPage = () => {
           currentPage={currentPage}
           totalPages={totalPages}
           totalItems={totalProducts}
-          itemsPerPage={productsPerPage}
+          itemsPerPage={limit}
           onPageChange={(page) => {
             window.scrollTo({ top: 0, behavior: "smooth" });
             const params = new URLSearchParams(searchParams);
