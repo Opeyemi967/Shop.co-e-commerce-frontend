@@ -1,7 +1,4 @@
-// ================================================================
-// IMPORTS
-// ================================================================
-
+// src/pages/ProductsPage.jsx
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,22 +9,10 @@ import { FaChevronDown } from "react-icons/fa";
 import Pagination from "../components/common/Pagination";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 
-// ================================================================
-// PRODUCTS PAGE
-// ================================================================
-
 const ProductsPage = () => {
-  // ================================================================
-  // HOOKS
-  // ================================================================
-
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
-
-  // ================================================================
-  // REDUX STATE
-  // ================================================================
 
   const {
     products,
@@ -39,51 +24,28 @@ const ProductsPage = () => {
     productsPerPage,
   } = useSelector((state) => state.product);
 
-  // ================================================================
-  // GET STYLE FROM URL
-  // ================================================================
-
   const style = searchParams.get("style") || "";
   const page = parseInt(searchParams.get("page")) || 1;
   const limit = 12;
 
-  // ================================================================
-  // EFFECTS - FIXED
-  // ================================================================
-
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchData = async () => {
-      if (isMounted) {
-        try {
-          await dispatch(fetchProducts({ style, page, limit }));
-        } catch (err) {
-          console.error("Error fetching products:", err);
-        }
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      isMounted = false;
-    };
+    console.log("🔄 Fetching products...");
+    dispatch(fetchProducts({ style, page, limit }));
   }, [dispatch, style, page, limit]);
 
-  // ================================================================
-  // FILTER PRODUCTS
-  // ================================================================
+  // ✅ DEBUG: Log the state
+  console.log("🔍 Products in Redux:", products);
+  console.log("🔍 Loading:", loading);
+  console.log("🔍 Error:", error);
+  console.log("🔍 Total Products:", totalProducts);
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  // ✅ If there are products, show them immediately (don't wait for loading)
+  if (products && products.length > 0) {
+    // Show products immediately
+  }
 
-  // ================================================================
-  // LOADING STATE
-  // ================================================================
-
-  if (loading) {
+  // ✅ Show loading only if loading is true AND no products yet
+  if (loading && products.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-100">
         <LoadingSpinner size="lg" text="Loading products..." />
@@ -91,17 +53,10 @@ const ProductsPage = () => {
     );
   }
 
-  // ================================================================
-  // ERROR STATE
-  // ================================================================
-
   if (error) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-500 text-5xl mb-4">⚠️</div>
-        <h2 className="text-2xl font-bold text-red-600 mb-4">
-          Error Loading Products
-        </h2>
+        <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
         <p className="text-gray-600">{error}</p>
         <button
           onClick={() => dispatch(fetchProducts({ style, page, limit }))}
@@ -113,26 +68,18 @@ const ProductsPage = () => {
     );
   }
 
-  // ================================================================
-  // RENDER
-  // ================================================================
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-8">
-      {/* ============================================================ */}
-      {/* BREADCRUMB */}
-      {/* ============================================================ */}
-
       <Breadcrumb
         items={[
           { name: "Home", path: "/" },
           { name: style ? `${style} Products` : "Products" },
         ]}
       />
-
-      {/* ============================================================ */}
-      {/* PAGE HEADER */}
-      {/* ============================================================ */}
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
         <h1 className="text-3xl md:text-4xl font-akira-super text-gray-800">
@@ -145,12 +92,8 @@ const ProductsPage = () => {
         </p>
       </div>
 
-      {/* ============================================================ */}
-      {/* SEARCH & FILTERS */}
-      {/* ============================================================ */}
-
+      {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
-        {/* Search Input */}
         <div className="flex-1">
           <input
             type="text"
@@ -161,7 +104,6 @@ const ProductsPage = () => {
           />
         </div>
 
-        {/* Style Filter Dropdown */}
         <div className="sm:w-48 relative">
           <select
             value={style}
@@ -181,14 +123,11 @@ const ProductsPage = () => {
             <option value="party">Party</option>
             <option value="gym">Gym</option>
           </select>
-
-          {/* Custom Arrow with Icon */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
             <FaChevronDown className="w-4 h-4" />
           </div>
         </div>
 
-        {/* Clear Filters */}
         {(style || searchTerm) && (
           <button
             onClick={() => {
@@ -201,10 +140,6 @@ const ProductsPage = () => {
           </button>
         )}
       </div>
-
-      {/* ============================================================ */}
-      {/* PRODUCTS GRID */}
-      {/* ============================================================ */}
 
       {filteredProducts.length === 0 ? (
         <div className="text-center py-16">
@@ -232,10 +167,6 @@ const ProductsPage = () => {
         </div>
       )}
 
-      {/* ============================================================ */}
-      {/* PAGINATION */}
-      {/* ============================================================ */}
-
       {totalPages > 1 && (
         <Pagination
           currentPage={currentPage}
@@ -250,10 +181,6 @@ const ProductsPage = () => {
           }}
         />
       )}
-
-      {/* ============================================================ */}
-      {/* RESULTS COUNT */}
-      {/* ============================================================ */}
 
       {filteredProducts.length > 0 && (
         <div className="text-center text-sm text-gray-500 mt-8">
