@@ -1,12 +1,14 @@
 // Review API service - Vite compatible
 
 // Use import.meta.env for Vite
-const API_URL = import.meta.env.VITE_API_URL || "https://shopco-backend.onrender.com";
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://shop-co-e-commerce-backend.onrender.com/api/v1";
 
 export const getProductReviews = async (productId, page = 1, limit = 10) => {
   try {
     const response = await fetch(
-      `${API_URL}/api/v1/products/${productId}/reviews?page=${page}&limit=${limit}`
+      `${API_URL}/api/v1/products/${productId}/reviews?page=${page}&limit=${limit}`,
     );
 
     if (!response.ok) {
@@ -33,7 +35,7 @@ export const createReview = async (productId, rating, comment) => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ rating, comment }),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -61,7 +63,7 @@ export const updateReview = async (productId, reviewId, rating, comment) => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ rating, comment }),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -87,7 +89,7 @@ export const deleteReview = async (productId, reviewId) => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
 
     if (!response.ok) {
@@ -112,7 +114,7 @@ export const getUserReviews = async (page = 1, limit = 10) => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
 
     if (!response.ok) {

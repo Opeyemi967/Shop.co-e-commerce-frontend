@@ -37,7 +37,7 @@ const PaymentVerificationPage = () => {
         // ✅ Verify with backend
         const apiUrl =
           import.meta.env.VITE_API_URL ||
-          "https://shopco-backend.onrender.com/api/v1";
+          "https://shop-co-e-commerce-backend.onrender.com/api/v1";
         const token = localStorage.getItem("token");
 
         console.log(

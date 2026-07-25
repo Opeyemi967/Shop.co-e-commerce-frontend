@@ -4,7 +4,7 @@
 
 import axios from "axios";
 
-const API_URL = "https://shopco-backend.onrender.com/api/v1/products";
+const API_URL =  "https://shop-co-e-commerce-backend.onrender.com/api/v1";
 
 // ================================================================
 // GET PRODUCTS (WITH PAGINATION)
