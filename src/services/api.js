@@ -7,8 +7,8 @@ import axios from "axios";
 // ================================================================
 // API BASE URL - HARDCODED FOR PRODUCTION
 // ================================================================
-// ✅ Hardcoded to your Render backend
-const API_URL = "https://shopco-backend.onrender.com/api/v1";
+// ✅ Hardcoded to your Render backend - CORRECTED URL
+const API_URL = "https://shop-co-e-commerce-backend.onrender.com/api/v1";
 
 console.log("🔍 Using API_URL:", API_URL);
 
