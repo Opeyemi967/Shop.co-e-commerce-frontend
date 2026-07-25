@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
   Outlet,
 } from "react-router-dom";
-import { CustomToaster } from "./lib/toast";
+import { CustomToaster } from "./lib/Toast";
 
 // Layout Components
 import Navbar from "./components/layout/Navbar";
