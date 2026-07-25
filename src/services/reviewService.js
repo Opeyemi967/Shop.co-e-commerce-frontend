@@ -1,7 +1,7 @@
 // Review API service - Vite compatible
 
 // Use import.meta.env for Vite
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3003";
+const API_URL = import.meta.env.VITE_API_URL || "https://shopco-backend.onrender.com";
 
 export const getProductReviews = async (productId, page = 1, limit = 10) => {
   try {

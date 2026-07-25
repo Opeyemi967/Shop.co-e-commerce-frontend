@@ -16,8 +16,8 @@ import { clearWishlist } from "./wishlistSlice";
 // API BASE URL
 // ================================================================
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3003/api/v1";
-
+const API_URL =
+  import.meta.env.VITE_API_URL || "https://shopco-backend.onrender.com/api/v1";
 // ================================================================
 // ASYNC THUNKS
 // ================================================================
@@ -38,10 +38,10 @@ export const loginUser = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Login failed. Please try again."
+        error.response?.data?.message || "Login failed. Please try again.",
       );
     }
-  }
+  },
 );
 
 export const registerUser = createAsyncThunk(
@@ -71,10 +71,10 @@ export const registerUser = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message ||
-          "Registration failed. Please try again."
+          "Registration failed. Please try again.",
       );
     }
-  }
+  },
 );
 
 export const getCurrentUser = createAsyncThunk(
@@ -96,10 +96,10 @@ export const getCurrentUser = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to get user data."
+        error.response?.data?.message || "Failed to get user data.",
       );
     }
-  }
+  },
 );
 
 export const forgotPassword = createAsyncThunk(
@@ -113,10 +113,10 @@ export const forgotPassword = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message ||
-          "Failed to send reset email. Please try again."
+          "Failed to send reset email. Please try again.",
       );
     }
-  }
+  },
 );
 
 export const resetPassword = createAsyncThunk(
@@ -132,10 +132,10 @@ export const resetPassword = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message ||
-          "Failed to reset password. Please try again."
+          "Failed to reset password. Please try again.",
       );
     }
-  }
+  },
 );
 
 // ================================================================
@@ -364,9 +364,9 @@ export const {
   setLoading,
   clearForgotPasswordState,
   clearResetPasswordState,
-  checkAuth, 
-  setAuth, 
-  clearAuth, 
+  checkAuth,
+  setAuth,
+  clearAuth,
 } = authSlice.actions;
 
 export default authSlice.reducer;
