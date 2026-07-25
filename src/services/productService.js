@@ -1,42 +1,33 @@
 // ================================================================
-// PRODUCT SERVICE WITH REQUEST DEDUPLICATION
+// PRODUCT SERVICE WITH PAGINATION & TOP SELLING
 // ================================================================
 
 import axios from "axios";
 
 const API_URL = "https://shop-co-e-commerce-backend.onrender.com/api/v1";
 
-// ✅ Pending request cache to prevent duplicates
-const pendingRequests = new Map();
-
 // ================================================================
 // GET PRODUCTS (WITH PAGINATION)
 // ================================================================
 
 const getProducts = async (style = "", page = 1, limit = 12) => {
-  const cacheKey = `products_${style}_${page}_${limit}`;
-
-  // If a request with this key is already in progress, return its promise
-  if (pendingRequests.has(cacheKey)) {
-    console.log("⏳ Deduplicating request:", cacheKey);
-    return pendingRequests.get(cacheKey);
-  }
-
   let url = `${API_URL}/products?page=${page}&limit=${limit}`;
   if (style) {
     url += `&style=${style}`;
   }
 
-  console.log("🔄 Making request:", cacheKey);
-  const requestPromise = axios.get(url).then((res) => res.data);
-  pendingRequests.set(cacheKey, requestPromise);
+  console.log("🔍 Fetching products from:", url);
 
-  try {
-    const result = await requestPromise;
-    return result;
-  } finally {
-    pendingRequests.delete(cacheKey);
+  // ✅ Add token if available
+  const token = localStorage.getItem("token");
+  const headers = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
   }
+
+  const response = await axios.get(url, { headers });
+  console.log("🔍 Products response:", response.data);
+  return response.data;
 };
 
 // ================================================================
@@ -44,25 +35,16 @@ const getProducts = async (style = "", page = 1, limit = 12) => {
 // ================================================================
 
 const getTopSelling = async (limit = 4) => {
-  const cacheKey = `topSelling_${limit}`;
-
-  if (pendingRequests.has(cacheKey)) {
-    console.log("⏳ Deduplicating request:", cacheKey);
-    return pendingRequests.get(cacheKey);
+  const url = `${API_URL}/products/top-selling?limit=${limit}`;
+  
+  const token = localStorage.getItem("token");
+  const headers = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
   }
 
-  console.log("🔄 Making request:", cacheKey);
-  const requestPromise = axios
-    .get(`${API_URL}/products/top-selling?limit=${limit}`)
-    .then((res) => res.data);
-  pendingRequests.set(cacheKey, requestPromise);
-
-  try {
-    const result = await requestPromise;
-    return result;
-  } finally {
-    pendingRequests.delete(cacheKey);
-  }
+  const response = await axios.get(url, { headers });
+  return response.data;
 };
 
 // ================================================================
@@ -70,25 +52,16 @@ const getTopSelling = async (limit = 4) => {
 // ================================================================
 
 const getSingleProduct = async (id) => {
-  const cacheKey = `singleProduct_${id}`;
-
-  if (pendingRequests.has(cacheKey)) {
-    console.log("⏳ Deduplicating request:", cacheKey);
-    return pendingRequests.get(cacheKey);
+  const url = `${API_URL}/products/${id}`;
+  
+  const token = localStorage.getItem("token");
+  const headers = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
   }
 
-  console.log("🔄 Making request:", cacheKey);
-  const requestPromise = axios
-    .get(`${API_URL}/products/${id}`)
-    .then((res) => res.data);
-  pendingRequests.set(cacheKey, requestPromise);
-
-  try {
-    const result = await requestPromise;
-    return result;
-  } finally {
-    pendingRequests.delete(cacheKey);
-  }
+  const response = await axios.get(url, { headers });
+  return response.data;
 };
 
 // ================================================================
