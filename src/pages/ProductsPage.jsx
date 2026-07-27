@@ -21,7 +21,7 @@ const ProductsPage = () => {
   const page = parseInt(searchParams.get("page")) || 1;
   const limit = 12;
 
-  // ✅ DIRECT API CALL - NO REDUX
+  // ✅ DIRECT API FETCH - NO REDUX
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -33,12 +33,12 @@ const ProductsPage = () => {
           url += `&style=${style}`;
         }
 
-        console.log("📡 FETCHING:", url);
+        console.log("📡 FETCHING PRODUCTS:", url);
 
         const response = await fetch(url);
         const data = await response.json();
 
-        console.log("📡 DATA:", data);
+        console.log("📡 PRODUCTS DATA:", data);
 
         if (data.success) {
           setProducts(data.data || []);
@@ -49,7 +49,7 @@ const ProductsPage = () => {
           setError(data.message || "Failed to fetch products");
         }
       } catch (err) {
-        console.error("❌ ERROR:", err);
+        console.error("❌ FETCH ERROR:", err);
         setError(err.message || "Failed to fetch products");
       } finally {
         setLoading(false);
