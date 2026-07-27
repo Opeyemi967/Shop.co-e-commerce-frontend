@@ -1,15 +1,9 @@
-// App.jsx - Updated with Data Router
+// App.jsx - WORKING VERSION
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  createBrowserRouter,
-  RouterProvider,
-  ScrollRestoration,
-  Outlet,
-} from "react-router-dom";
-import { CustomToaster } from "./lib/Toast";
 
-// Layout Components
+import { CustomToaster } from "./lib/Toast";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 
@@ -44,141 +38,10 @@ import { getCurrentUser } from "./redux/slices/authSlice";
 import { fetchCart, clearCart } from "./redux/slices/cartSlice";
 import { fetchWishlist, clearWishlist } from "./redux/slices/wishlistSlice";
 
-// Layout Component with ScrollRestoration
-const Layout = () => {
-  return (
-    <>
-      <CustomToaster />
-      <Navbar />
-      <ScrollRestoration />
-      <Outlet />
-      <Footer />
-    </>
-  );
-};
-
-// Create the router
-const router = createBrowserRouter([
-  {
-    element: <Layout />,
-    children: [
-      // Public Routes
-      { path: "/", element: <HomePage /> },
-      { path: "/login", element: <LoginPage /> },
-      { path: "/register", element: <RegisterPage /> },
-      { path: "/forgot-password", element: <ForgotPasswordPage /> },
-      { path: "/reset-password", element: <ResetPasswordPage /> },
-      { path: "/reset-password/:token", element: <ResetPasswordPage /> },
-      { path: "/products", element: <ProductsPage /> }, // ✅ ADDED
-      { path: "/products/:id", element: <ProductDetailsPage /> },
-      { path: "/about", element: <AboutPage /> },
-      { path: "/contact", element: <ContactPage /> },
-      { path: "/faq", element: <FAQPage /> },
-      { path: "/shipping", element: <ShippingPage /> },
-      { path: "/returns", element: <ReturnsPage /> },
-      { path: "/privacy", element: <PrivacyPage /> },
-
-      // Protected Routes
-      {
-        path: "/cart",
-        element: (
-          <ProtectedRoute>
-            <CartPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/wishlist",
-        element: (
-          <ProtectedRoute>
-            <WishlistPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/checkout",
-        element: (
-          <ProtectedRoute>
-            <CheckoutPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/order-confirmation",
-        element: (
-          <ProtectedRoute>
-            <OrderConfirmationPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/orders",
-        element: (
-          <ProtectedRoute>
-            <OrderHistoryPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/orders/:id",
-        element: (
-          <ProtectedRoute>
-            <OrderDetailsPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/payment/verify",
-        element: (
-          <ProtectedRoute>
-            <PaymentVerificationPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/payment-failed",
-        element: (
-          <ProtectedRoute>
-            <PaymentVerificationPage />
-          </ProtectedRoute>
-        ),
-      },
-
-      // Admin Routes
-      {
-        path: "/admin/dashboard",
-        element: (
-          <ProtectedRoute adminOnly={true}>
-            <AdminDashboard />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/admin/orders",
-        element: (
-          <ProtectedRoute adminOnly={true}>
-            <AdminOrders />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/admin/orders/:id",
-        element: (
-          <ProtectedRoute adminOnly={true}>
-            <AdminOrderDetails />
-          </ProtectedRoute>
-        ),
-      },
-    ],
-  },
-]);
-
-// App Component with RouterProvider
 function App() {
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
 
-  // Fetch user data if authenticated
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -191,16 +54,139 @@ function App() {
     }
   }, [isAuthenticated, dispatch]);
 
-  // Fetch current user on app load
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (token) {
       dispatch(getCurrentUser());
     }
   }, [dispatch]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <BrowserRouter>
+      <CustomToaster />
+      <Navbar />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/:id" element={<ProductDetailsPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/shipping" element={<ShippingPage />} />
+        <Route path="/returns" element={<ReturnsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <CartPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <WishlistPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <CheckoutPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/order-confirmation"
+          element={
+            <ProtectedRoute>
+              <OrderConfirmationPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <OrderHistoryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders/:id"
+          element={
+            <ProtectedRoute>
+              <OrderDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payment/verify"
+          element={
+            <ProtectedRoute>
+              <PaymentVerificationPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payment-failed"
+          element={
+            <ProtectedRoute>
+              <PaymentVerificationPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin Routes */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/orders"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminOrders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/orders/:id"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminOrderDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 404 Fallback */}
+        <Route
+          path="*"
+          element={
+            <div className="text-center py-20">
+              <h1 className="text-4xl font-bold">404 - Page Not Found</h1>
+            </div>
+          }
+        />
+      </Routes>
+      <Footer />
+    </BrowserRouter>
+  );
 }
 
 export default App;
