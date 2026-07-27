@@ -1,4 +1,4 @@
-// src/pages/ProductsPage.jsx
+// src/pages/ProductsPage.jsx - CLEAN VERSION
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/product/ProductCard";
@@ -21,7 +21,7 @@ const ProductsPage = () => {
   const page = parseInt(searchParams.get("page")) || 1;
   const limit = 12;
 
-  // ✅ DIRECT API FETCH WITH TOKEN
+  // ✅ DIRECT FETCH - NO REDUX
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -35,26 +35,9 @@ const ProductsPage = () => {
 
         console.log("📡 FETCHING PRODUCTS:", url);
 
-        // ✅ Get token from localStorage
-        const token = localStorage.getItem("token");
-        console.log("🔑 Token exists?", !!token);
-
-        // ✅ Add Authorization header if token exists
-        const headers = {
-          "Content-Type": "application/json",
-        };
-        if (token) {
-          headers.Authorization = `Bearer ${token}`;
-        }
-
-        const response = await fetch(url, { headers });
-        console.log("📡 Response status:", response.status);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
+        const response = await fetch(url);
         const data = await response.json();
+
         console.log("📡 PRODUCTS DATA:", data);
 
         if (data.success) {
