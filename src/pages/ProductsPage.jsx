@@ -1,4 +1,4 @@
-// src/pages/ProductsPage.jsx - CLEAN VERSION
+// src/pages/ProductsPage.jsx
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/product/ProductCard";
@@ -21,13 +21,14 @@ const ProductsPage = () => {
   const page = parseInt(searchParams.get("page")) || 1;
   const limit = 12;
 
-  // ✅ DIRECT FETCH - NO REDUX
+  // ✅ DIRECT API FETCH - CORRECT ENDPOINT
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
         setError(null);
 
+        // ✅ CORRECT URL - includes /products
         let url = `https://shop-co-e-commerce-backend.onrender.com/api/v1/products?page=${page}&limit=${limit}`;
         if (style) {
           url += `&style=${style}`;
