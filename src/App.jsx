@@ -1,5 +1,5 @@
-// App.jsx - WORKING VERSION
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+// App.jsx - FIXED FOR RENDER 404 ERRORS
+import { HashRouter, Routes, Route } from "react-router-dom"; // <--- CHANGED TO HASHROUTER
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -62,7 +62,9 @@ function App() {
   }, [dispatch]);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
+      {" "}
+      {/* <--- CHANGED TO HASHROUTER WRAPPER */}
       <CustomToaster />
       <Navbar />
       <Routes>
@@ -185,7 +187,7 @@ function App() {
         />
       </Routes>
       <Footer />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
