@@ -1,6 +1,6 @@
 // src/pages/ProductsPage.jsx
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom"; // Added useNavigate
 import ProductCard from "../components/product/ProductCard";
 import Breadcrumb from "../components/common/Breadcrumb";
 import { FaChevronDown } from "react-icons/fa";
@@ -8,8 +8,11 @@ import Pagination from "../components/common/Pagination";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 
 const ProductsPage = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams(); // Added setSearchParams
+  const navigate = useNavigate(); // Added navigate
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Products state
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,7 +24,7 @@ const ProductsPage = () => {
   const page = parseInt(searchParams.get("page")) || 1;
   const limit = 12;
 
-  // ✅ DIRECT API FETCH - NO REDUX
+  // ✅ DIRECT API FETCH
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -59,10 +62,24 @@ const ProductsPage = () => {
     fetchProducts();
   }, [style, page, limit]);
 
-  // Filter products by search term
+  // Filter products by search term (Client-side filtering within current page)
+  // NOTE: For a real global search, you'd need a backend search API.
+  // This filters the currently loaded 12 items perfectly for the user.
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
+  // HANDLE PAGE CHANGE (NO RELOAD, React Router way)
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) return;
+
+    // Update URL params using React Router (Works with HashRouter!)
+    const params = new URLSearchParams(searchParams);
+    params.set("page", newPage);
+    setSearchParams(params); // Updates URL without reloading the page
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Loading state
   if (loading) {
@@ -125,11 +142,14 @@ const ProductsPage = () => {
             value={style}
             onChange={(e) => {
               const value = e.target.value;
+              const params = new URLSearchParams(searchParams);
               if (value) {
-                window.location.href = `/products?style=${value}`;
+                params.set("style", value);
               } else {
-                window.location.href = "/products";
+                params.delete("style");
               }
+              params.set("page", 1); // Reset to page 1 when filter changes
+              setSearchParams(params);
             }}
             className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-transparent transition bg-white appearance-none cursor-pointer"
           >
@@ -148,7 +168,10 @@ const ProductsPage = () => {
           <button
             onClick={() => {
               setSearchTerm("");
-              window.location.href = "/products";
+              const params = new URLSearchParams(searchParams);
+              params.delete("style");
+              params.delete("page");
+              setSearchParams(params);
             }}
             className="px-4 py-3 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
           >
@@ -168,7 +191,10 @@ const ProductsPage = () => {
           <button
             onClick={() => {
               setSearchTerm("");
-              window.location.href = "/products";
+              const params = new URLSearchParams(searchParams);
+              params.delete("style");
+              params.delete("page");
+              setSearchParams(params);
             }}
             className="mt-4 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition"
           >
@@ -183,18 +209,14 @@ const ProductsPage = () => {
         </div>
       )}
 
+      {/* Pagination rendered conditionally */}
       {totalPages > 1 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           totalItems={totalProducts}
           itemsPerPage={limit}
-          onPageChange={(page) => {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-            const params = new URLSearchParams(searchParams);
-            params.set("page", page);
-            window.location.href = `/products?${params.toString()}`;
-          }}
+          onPageChange={handlePageChange} // Uses the smooth function above
         />
       )}
 
