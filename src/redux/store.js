@@ -8,24 +8,12 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import authReducer from "./slices/authSlice";
 
-// Import product reducer
-// Handles fetching + storing products
-
-import productReducer from "./slices/productSlice";
-
-// NEW
 // Import wishlist reducer
 // Handles wishlist state
-// Example:
-// store.wishlist.wishlistItems
-// store.wishlist.loading
-// store.wishlist.error
 import wishlistReducer from "./slices/wishlistSlice";
 
-// NEW
 // Import cart reducer
 // Handles shopping cart state
-
 import cartReducer from "./slices/cartSlice";
 
 // ==============================================
@@ -46,17 +34,6 @@ export const store = configureStore({
     auth: authReducer,
 
     // =====================================
-    // PRODUCT STATE
-    // =====================================
-    //
-    // Example:
-    // store.product.products
-    // store.product.loading
-    // store.product.error
-
-    product: productReducer,
-
-    // =====================================
     // CART STATE
     // =====================================
     //
@@ -72,6 +49,7 @@ export const store = configureStore({
     // store.wishlist.wishlistItems
     // store.wishlist.loading
     // store.wishlist.error
+
     wishlist: wishlistReducer,
   },
 });
