@@ -1,19 +1,11 @@
-// HomePage.jsx
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+// HomePage.jsx - NO REDUX, DIRECT FETCH
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FiArrowRight } from "react-icons/fi";
 
 import { getImage } from "../../config/images";
 import ProductCard from "../../components/product/ProductCard";
-import { fetchProducts } from "../../redux/slices/productSlice";
-import productService from "../../services/productService";
-
-// ✅ Import the BrandBanner component
 import BrandBanner from "../../components/common/BrandBanner";
-
-// ✅ Import the useApi hook
-import useApi from "../../hooks/useApi";
 
 // ==============================================
 // TOP SELLING SKELETON
@@ -39,38 +31,72 @@ const TopSellingSkeleton = () => {
 // ==============================================
 
 function HomePage() {
-  const dispatch = useDispatch();
-  const { products, loading, error, hasFetched } = useSelector(
-    (state) => state.product,
-  );
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [topProducts, setTopProducts] = useState([]);
+  const [topLoading, setTopLoading] = useState(true);
+  const [topError, setTopError] = useState(null);
 
-  // ✅ Use the API hook for top selling
-  const {
-    data: topSellingData,
-    loading: topSellingLoading,
-    isServerError,
-    isNetworkError,
-    error: topSellingError,
-    execute: fetchTopSelling,
-  } = useApi(productService.getTopSelling);
+  const API_URL = "https://shop-co-e-commerce-backend.onrender.com/api/v1";
 
-  // ✅ Fetch products ONLY ONCE when component mounts and not already fetched
+  // ✅ Fetch products directly - NO REDUX
   useEffect(() => {
-    if (!hasFetched && !loading) {
-      dispatch(fetchProducts());
-    }
-  }, []); // ← FIXED: Empty dependency array to run ONCE
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  // ✅ Fetch Top Selling products ONCE when component mounts
+        const response = await fetch(`${API_URL}/products?page=1&limit=4`);
+        const data = await response.json();
+
+        if (data.success) {
+          setProducts(data.data || []);
+        } else {
+          setError(data.message || "Failed to fetch products");
+        }
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setError(err.message || "Failed to fetch products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // ✅ Fetch top selling directly - NO REDUX
   useEffect(() => {
-    fetchTopSelling(4);
-  }, []); // ← FIXED: Empty dependency array
+    const fetchTopSelling = async () => {
+      try {
+        setTopLoading(true);
+        setTopError(null);
+
+        const response = await fetch(`${API_URL}/products/top-selling?limit=4`);
+        const data = await response.json();
+
+        if (data.success) {
+          setTopProducts(data.data || []);
+        } else {
+          setTopError(data.message || "Failed to fetch top selling");
+        }
+      } catch (err) {
+        console.error("Error fetching top selling:", err);
+        setTopError(err.message || "Failed to fetch top selling");
+      } finally {
+        setTopLoading(false);
+      }
+    };
+
+    fetchTopSelling();
+  }, []);
 
   // ================================================================
   // LOADING STATES
   // ================================================================
 
-  if (!hasFetched && loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -87,7 +113,7 @@ function HomePage() {
         <div className="text-red-500 text-5xl mb-4">⚠️</div>
         <p className="text-red-500 text-xl font-medium">{error}</p>
         <button
-          onClick={() => dispatch(fetchProducts())}
+          onClick={() => window.location.reload()}
           className="mt-4 bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition"
         >
           Try Again
@@ -109,20 +135,16 @@ function HomePage() {
   // ================================================================
 
   const renderTopSelling = () => {
-    // ✅ Server Error (500)
-    if (isServerError) {
+    if (topError) {
       return (
         <div className="text-center py-12">
           <div className="text-red-500 text-5xl mb-4">⚠️</div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Server Error
+            Error Loading Top Selling
           </h3>
-          <p className="text-gray-600 mb-4">
-            {topSellingError?.message ||
-              "Something went wrong on our end. Please try again later."}
-          </p>
+          <p className="text-gray-600 mb-4">{topError}</p>
           <button
-            onClick={() => fetchTopSelling(4)}
+            onClick={() => window.location.reload()}
             className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
           >
             Try Again
@@ -131,34 +153,10 @@ function HomePage() {
       );
     }
 
-    // ✅ Network Error
-    if (isNetworkError) {
-      return (
-        <div className="text-center py-12">
-          <div className="text-yellow-500 text-5xl mb-4">📶</div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Connection Lost
-          </h3>
-          <p className="text-gray-600 mb-4">
-            Please check your internet connection and try again.
-          </p>
-          <button
-            onClick={() => fetchTopSelling(4)}
-            className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            Retry Connection
-          </button>
-        </div>
-      );
-    }
-
-    // ✅ Loading
-    if (topSellingLoading) {
+    if (topLoading) {
       return <TopSellingSkeleton />;
     }
 
-    // ✅ Success - Show Products
-    const topProducts = topSellingData?.data || [];
     if (topProducts.length > 0) {
       return (
         <div className="grid md:grid-cols-4 gap-6">
@@ -169,7 +167,6 @@ function HomePage() {
       );
     }
 
-    // ✅ No Products
     return (
       <div className="text-center py-8 text-gray-500">
         No top selling products available
@@ -238,7 +235,7 @@ function HomePage() {
       </section>
 
       {/* ================================= */}
-      {/* BRAND BANNER - Updated with Infinite Scroll */}
+      {/* BRAND BANNER */}
       {/* ================================= */}
 
       <BrandBanner />
@@ -267,7 +264,7 @@ function HomePage() {
       </section>
 
       {/* ================================= */}
-      {/* TOP SELLING - WITH ERROR HANDLING */}
+      {/* TOP SELLING */}
       {/* ================================= */}
 
       <section className="max-w-6xl mx-auto px-5 py-20 border-t">
