@@ -1,6 +1,6 @@
 // src/pages/ProductsPage.jsx
 import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom"; // Added useNavigate
+import { useSearchParams, useNavigate } from "react-router-dom"; // ADDED useNavigate
 import ProductCard from "../components/product/ProductCard";
 import Breadcrumb from "../components/common/Breadcrumb";
 import { FaChevronDown } from "react-icons/fa";
@@ -8,11 +8,10 @@ import Pagination from "../components/common/Pagination";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 
 const ProductsPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams(); // Added setSearchParams
-  const navigate = useNavigate(); // Added navigate
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate(); // ADDED this
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Products state
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,17 +20,18 @@ const ProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const style = searchParams.get("style") || "";
-  const page = parseInt(searchParams.get("page")) || 1;
+  // Read page from URL. Default to 1 if missing or invalid.
+  const urlPage = parseInt(searchParams.get("page")) || 1;
   const limit = 12;
 
-  // ✅ DIRECT API FETCH
+  // ✅ FETCH PRODUCTS
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        let url = `https://shop-co-e-commerce-backend.onrender.com/api/v1/products?page=${page}&limit=${limit}`;
+        let url = `https://shop-co-e-commerce-backend.onrender.com/api/v1/products?page=${urlPage}&limit=${limit}`;
         if (style) {
           url += `&style=${style}`;
         }
@@ -47,7 +47,7 @@ const ProductsPage = () => {
           setProducts(data.data || []);
           setTotalProducts(data.totalProducts || 0);
           setTotalPages(data.totalPages || 1);
-          setCurrentPage(data.page || page);
+          setCurrentPage(data.page || urlPage);
         } else {
           setError(data.message || "Failed to fetch products");
         }
@@ -60,23 +60,21 @@ const ProductsPage = () => {
     };
 
     fetchProducts();
-  }, [style, page, limit]);
+  }, [style, urlPage, limit]); // Uses urlPage instead of page state
 
-  // Filter products by search term (Client-side filtering within current page)
-  // NOTE: For a real global search, you'd need a backend search API.
-  // This filters the currently loaded 12 items perfectly for the user.
+  // ✅ CLIENT-SIDE SEARCH FILTER (Only filters the current 12 items)
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  // HANDLE PAGE CHANGE (NO RELOAD, React Router way)
+  // ✅ FIXED HANDLE PAGE CHANGE (This makes the buttons work!)
   const handlePageChange = (newPage) => {
     if (newPage < 1 || newPage > totalPages) return;
 
-    // Update URL params using React Router (Works with HashRouter!)
+    // Update the URL via navigate (Works great with HashRouter)
     const params = new URLSearchParams(searchParams);
     params.set("page", newPage);
-    setSearchParams(params); // Updates URL without reloading the page
+    navigate(`/products?${params.toString()}`); // Uses navigate instead of setSearchParams
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -149,7 +147,7 @@ const ProductsPage = () => {
                 params.delete("style");
               }
               params.set("page", 1); // Reset to page 1 when filter changes
-              setSearchParams(params);
+              navigate(`/products?${params.toString()}`);
             }}
             className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-transparent transition bg-white appearance-none cursor-pointer"
           >
@@ -171,7 +169,7 @@ const ProductsPage = () => {
               const params = new URLSearchParams(searchParams);
               params.delete("style");
               params.delete("page");
-              setSearchParams(params);
+              navigate(`/products?${params.toString()}`);
             }}
             className="px-4 py-3 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
           >
@@ -180,6 +178,7 @@ const ProductsPage = () => {
         )}
       </div>
 
+      {/* Product Grid */}
       {filteredProducts.length === 0 ? (
         <div className="text-center py-16">
           <h3 className="text-2xl font-bold text-gray-700 mb-2">
@@ -194,7 +193,7 @@ const ProductsPage = () => {
               const params = new URLSearchParams(searchParams);
               params.delete("style");
               params.delete("page");
-              setSearchParams(params);
+              navigate(`/products?${params.toString()}`);
             }}
             className="mt-4 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition"
           >
@@ -209,14 +208,14 @@ const ProductsPage = () => {
         </div>
       )}
 
-      {/* Pagination rendered conditionally */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           totalItems={totalProducts}
           itemsPerPage={limit}
-          onPageChange={handlePageChange} // Uses the smooth function above
+          onPageChange={handlePageChange}
         />
       )}
 
