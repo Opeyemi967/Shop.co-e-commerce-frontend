@@ -4,14 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
-
-// Redux actions
-import {
-  fetchSingleProduct,
-  clearProductError,
-} from "../redux/slices/productSlice";
 
 // Hooks
 import { useReviews } from "../hooks/useReviews";
@@ -27,11 +20,6 @@ import ReviewList from "../components/product/ReviewList";
 import FAQSection from "../components/product/FAQSection";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 
-// ✅ Error Pages - Comment these out temporarily
-// import Error500 from "../pages/ErrorPages/Error500";
-// import Error404 from "../pages/ErrorPages/Error404";
-// import NetworkError from "../pages/ErrorPages/NetworkError";
-
 // ==============================================
 // PRODUCT DETAILS PAGE
 // ==============================================
@@ -42,23 +30,18 @@ function ProductDetailsPage() {
   // ================================================================
   const { id } = useParams();
   const location = useLocation();
-  const dispatch = useDispatch();
 
   // ================================================================
-  // REDUX STATE
+  // LOCAL STATE - NO REDUX
   // ================================================================
-  const { productDetails, loading, error } = useSelector(
-    (state) => state.product,
-  );
-
-  // ================================================================
-  // LOCAL STATE
-  // ================================================================
+  const [productDetails, setProductDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("details");
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [isNetworkError, setIsNetworkError] = useState(false);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
+
+  const API_URL = "https://shop-co-e-commerce-backend.onrender.com/api/v1";
 
   // ================================================================
   // CUSTOM HOOKS
@@ -86,23 +69,34 @@ function ProductDetailsPage() {
   } = useReviews(id);
 
   // ================================================================
-  // EFFECTS
+  // FETCH PRODUCT - DIRECT API CALL (NO REDUX)
   // ================================================================
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        setIsNetworkError(false);
-        await dispatch(fetchSingleProduct(id));
-        dispatch(clearProductError());
-      } catch (err) {
-        if (err?.code === "ERR_NETWORK" || err?.message?.includes("network")) {
-          setIsNetworkError(true);
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch(`${API_URL}/products/${id}`);
+        const data = await response.json();
+
+        if (data.success) {
+          setProductDetails(data.data);
+        } else {
+          setError(data.message || "Failed to fetch product");
         }
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setError(err.message || "Failed to fetch product");
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchProduct();
-  }, [dispatch, id, refreshKey]);
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
 
   // ================================================================
   // DERIVED STATE
@@ -176,7 +170,6 @@ function ProductDetailsPage() {
       } else {
         await handleSubmitReview(e);
       }
-      setRefreshKey((prev) => prev + 1);
       await refreshReviews();
     } catch (error) {
       console.error("Error submitting review:", error);
@@ -187,7 +180,6 @@ function ProductDetailsPage() {
   const handleReviewDeleteWrapper = async (reviewId) => {
     try {
       await handleDeleteReview(reviewId);
-      setRefreshKey((prev) => prev + 1);
       await refreshReviews();
     } catch (error) {
       console.error("Error deleting review:", error);
@@ -200,8 +192,6 @@ function ProductDetailsPage() {
   };
 
   const handleReviewUpdateWrapper = async () => {
-    setRefreshKey((prev) => prev + 1);
-    await dispatch(fetchSingleProduct(id));
     await refreshReviews();
   };
 
@@ -222,10 +212,7 @@ function ProductDetailsPage() {
           </h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
-            onClick={() => {
-              setRefreshKey((prev) => prev + 1);
-              dispatch(fetchSingleProduct(id));
-            }}
+            onClick={() => window.location.reload()}
             className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
           >
             Try Again
