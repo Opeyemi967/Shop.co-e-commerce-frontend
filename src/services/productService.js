@@ -1,38 +1,36 @@
-// ================================================================
-// PRODUCT SERVICE - COMPLETE WORKING VERSION
-// ================================================================
-
+// src/services/productService.js
 import axios from "axios";
 
 const API_URL = "https://shop-co-e-commerce-backend.onrender.com/api/v1";
 
 // ================================================================
-// GET PRODUCTS
+// GET PRODUCTS (WITH PAGINATION)
 // ================================================================
 
 const getProducts = async (style = "", page = 1, limit = 12) => {
+  // ✅ CORRECT - includes /products
   let url = `${API_URL}/products?page=${page}&limit=${limit}`;
   if (style) {
     url += `&style=${style}`;
   }
 
-  console.log("📡 REQUEST URL:", url);
+  console.log("📡 FETCHING PRODUCTS:", url);
 
   const response = await axios.get(url);
-
-  console.log("📡 RESPONSE DATA:", response.data);
+  console.log("📡 PRODUCTS RESPONSE:", response.data);
 
   return response.data;
 };
 
 // ================================================================
-// GET TOP SELLING
+// GET TOP SELLING PRODUCTS
 // ================================================================
 
 const getTopSelling = async (limit = 4) => {
-  const response = await axios.get(
-    `${API_URL}/products/top-selling?limit=${limit}`,
-  );
+  const url = `${API_URL}/products/top-selling?limit=${limit}`;
+  console.log("📡 FETCHING TOP SELLING:", url);
+
+  const response = await axios.get(url);
   return response.data;
 };
 
@@ -41,7 +39,10 @@ const getTopSelling = async (limit = 4) => {
 // ================================================================
 
 const getSingleProduct = async (id) => {
-  const response = await axios.get(`${API_URL}/products/${id}`);
+  const url = `${API_URL}/products/${id}`;
+  console.log("📡 FETCHING SINGLE PRODUCT:", url);
+
+  const response = await axios.get(url);
   return response.data;
 };
 
