@@ -21,45 +21,58 @@ const ProductsPage = () => {
   const page = parseInt(searchParams.get("page")) || 1;
   const limit = 12;
 
-  // ✅ DIRECT API FETCH - CORRECT URL
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        console.log("🟢 1. Starting fetch...");
         setLoading(true);
         setError(null);
 
-        // ✅ CORRECT - includes /products
         let url = `https://shop-co-e-commerce-backend.onrender.com/api/v1/products?page=${page}&limit=${limit}`;
         if (style) {
           url += `&style=${style}`;
         }
 
-        console.log("📡 FETCHING PRODUCTS:", url);
+        console.log("🟢 2. URL:", url);
 
+        console.log("🟢 3. Making fetch request...");
         const response = await fetch(url);
-        const data = await response.json();
+        console.log("🟢 4. Response status:", response.status);
+        console.log("🟢 5. Response ok:", response.ok);
 
-        console.log("📡 PRODUCTS DATA:", data);
+        if (!response.ok) {
+          console.error("🔴 6. Response not ok!");
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        console.log("🟢 7. Parsing JSON...");
+        const data = await response.json();
+        console.log("🟢 8. Data:", data);
 
         if (data.success) {
+          console.log("🟢 9. Success! Setting products...");
           setProducts(data.data || []);
           setTotalProducts(data.totalProducts || 0);
           setTotalPages(data.totalPages || 1);
           setCurrentPage(data.page || page);
         } else {
+          console.log("🔴 10. API returned error:", data.message);
           setError(data.message || "Failed to fetch products");
         }
       } catch (err) {
-        console.error("❌ FETCH ERROR:", err);
+        console.error("🔴 11. CATCH ERROR:", err);
+        console.error("🔴 12. Error name:", err.name);
+        console.error("🔴 13. Error message:", err.message);
+        console.error("🔴 14. Error stack:", err.stack);
         setError(err.message || "Failed to fetch products");
       } finally {
         setLoading(false);
+        console.log("🟢 15. Finally done");
       }
     };
 
     fetchProducts();
   }, [style, page, limit]);
-
   // Filter products by search term
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()),
