@@ -1,27 +1,30 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
-import {
-  deleteReview,
-  fetchSingleProduct,
-} from "../../redux/slices/productSlice";
 
 // ✅ Import the confirmation hook and modal
 import useConfirm from "../../hooks/useConfirm";
 import ConfirmModal from "../common/ConfirmModal";
 
-const ReviewList = ({ reviews, loading, productId }) => {
-  const dispatch = useDispatch();
+const API_URL = "https://shop-co-e-commerce-backend.onrender.com/api/v1";
+
+const ReviewList = ({
+  reviews,
+  loading,
+  productId,
+  onReviewDeleted,
+  onReviewUpdated,
+}) => {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [editingReview, setEditingReview] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // ✅ Use the confirmation hook
   const { showConfirm, getConfirmProps } = useConfirm();
 
-  // ✅ Handle delete with professional confirmation
+  // ✅ Handle delete with professional confirmation - DIRECT API CALL
   const handleDelete = async (reviewId) => {
-    // ✅ Show professional modal instead of window.confirm
     const confirmed = await showConfirm({
       title: "Delete Review",
       message:
@@ -33,12 +36,40 @@ const ReviewList = ({ reviews, loading, productId }) => {
 
     if (confirmed) {
       try {
-        await dispatch(deleteReview({ productId, reviewId })).unwrap();
-        toast.success("Review deleted successfully");
-        // Refresh product to update reviews
-        await dispatch(fetchSingleProduct(productId));
+        setDeleteLoading(true);
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+          toast.error("Please login to delete a review");
+          return;
+        }
+
+        const response = await fetch(
+          `${API_URL}/products/${productId}/reviews/${reviewId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+          toast.success("Review deleted successfully");
+          // Refresh product to update reviews
+          if (onReviewDeleted) {
+            onReviewDeleted();
+          }
+        } else {
+          toast.error(data.message || "Failed to delete review");
+        }
       } catch (error) {
-        toast.error(error || "Failed to delete review");
+        console.error("Error deleting review:", error);
+        toast.error(error.message || "Failed to delete review");
+      } finally {
+        setDeleteLoading(false);
       }
     }
     setOpenMenuId(null);
@@ -55,6 +86,9 @@ const ReviewList = ({ reviews, loading, productId }) => {
     }
     // Trigger edit mode in parent via custom event or callback
     window.dispatchEvent(new CustomEvent("editReview", { detail: review }));
+    if (onReviewUpdated) {
+      onReviewUpdated(review);
+    }
   };
 
   // Toggle menu
@@ -63,7 +97,7 @@ const ReviewList = ({ reviews, loading, productId }) => {
   };
 
   // Close menu when clicking outside
-  React.useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = () => setOpenMenuId(null);
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
@@ -186,7 +220,8 @@ const ReviewList = ({ reviews, loading, productId }) => {
                         </button>
                         <button
                           onClick={() => handleDelete(review._id)}
-                          className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                          disabled={deleteLoading}
+                          className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2 disabled:opacity-50"
                         >
                           <svg
                             width="16"
