@@ -40,6 +40,7 @@ function ProductDetailsPage() {
   const [activeTab, setActiveTab] = useState("details");
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const API_URL = "https://shop-co-e-commerce-backend.onrender.com/api/v1";
 
@@ -66,6 +67,7 @@ function ProductDetailsPage() {
     isReviewOwner,
     editingReview,
     refreshReviews,
+    fetchReviews,
   } = useReviews(id);
 
   // ================================================================
@@ -96,7 +98,20 @@ function ProductDetailsPage() {
     if (id) {
       fetchProduct();
     }
-  }, [id]);
+  }, [id, refreshTrigger]);
+
+  // ================================================================
+  // HANDLE REVIEW CHANGES - Refresh data
+  // ================================================================
+  const handleReviewChanged = async () => {
+    await fetchReviews();
+    // Refresh product details to update rating
+    const response = await fetch(`${API_URL}/products/${id}`);
+    const data = await response.json();
+    if (data.success) {
+      setProductDetails(data.data);
+    }
+  };
 
   // ================================================================
   // DERIVED STATE
@@ -166,11 +181,11 @@ function ProductDetailsPage() {
 
     try {
       if (editingReview) {
-        await handleUpdateReview(e);
+        await handleUpdateReview(editingReview._id, { rating, comment });
       } else {
         await handleSubmitReview(e);
       }
-      await refreshReviews();
+      await handleReviewChanged();
     } catch (error) {
       console.error("Error submitting review:", error);
       toast.error("Failed to submit review. Please try again.");
@@ -180,7 +195,7 @@ function ProductDetailsPage() {
   const handleReviewDeleteWrapper = async (reviewId) => {
     try {
       await handleDeleteReview(reviewId);
-      await refreshReviews();
+      await handleReviewChanged();
     } catch (error) {
       console.error("Error deleting review:", error);
       toast.error("Failed to delete review. Please try again.");
@@ -192,7 +207,7 @@ function ProductDetailsPage() {
   };
 
   const handleReviewUpdateWrapper = async () => {
-    await refreshReviews();
+    await handleReviewChanged();
   };
 
   // ================================================================
@@ -342,6 +357,8 @@ function ProductDetailsPage() {
               isReviewOwner={isReviewOwner}
               onEdit={handleReviewEditWrapper}
               onDelete={handleReviewDeleteWrapper}
+              onReviewDeleted={handleReviewChanged}
+              onReviewUpdated={handleReviewChanged}
             />
           </div>
         )}
