@@ -349,6 +349,7 @@ function ProductDetailsPage() {
               editingReview={editingReview}
               onCancelEdit={handleCancelEdit}
               onUpdate={handleReviewUpdateWrapper}
+              onReviewUpdated={handleReviewChanged}
             />
 
             <ReviewList
