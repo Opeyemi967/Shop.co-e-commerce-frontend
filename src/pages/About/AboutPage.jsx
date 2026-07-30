@@ -24,7 +24,7 @@ function About() {
           {/* Left - Image */}
           {/* On tablet (md) and below: image first, content second */}
           {/* On desktop (lg): image left, content right */}
-          <div className="order-1 lg:order-1">
+          <div className="order-1 lg:order-1 mb-8 lg:mb-0">
             <img
               src={getImage("aboutHero", {
                 width: 700,
@@ -33,7 +33,8 @@ function About() {
               })}
               alt="About SHOP.CO"
               loading="lazy"
-              className="rounded-3xl shadow-lg w-full h-125 object-cover"
+              // FIXED: Changed static h-125 to responsive heights
+              className="rounded-3xl shadow-lg w-full h-64 md:h-80 lg:h-125 object-cover"
             />
           </div>
 
