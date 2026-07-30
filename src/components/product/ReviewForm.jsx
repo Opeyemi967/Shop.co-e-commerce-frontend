@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
-import {
-  submitReview,
-  fetchSingleProduct,
-} from "../../redux/slices/productSlice";
 
-const ReviewForm = ({ productId, onReviewSubmitted }) => {
-  const dispatch = useDispatch();
+const API_URL = "https://shop-co-e-commerce-backend.onrender.com/api/v1";
+
+const ReviewForm = ({ productId, onReviewSubmitted, onReviewUpdated }) => {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
-  const { reviewLoading } = useSelector((state) => state.product);
 
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [editingReview, setEditingReview] = useState(null);
   const [hoveredRating, setHoveredRating] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   // Listen for edit events
   useEffect(() => {
@@ -52,32 +49,57 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
       return;
     }
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login to submit a review");
+      return;
+    }
+
     try {
-      const result = await dispatch(
-        submitReview({
-          productId,
-          rating,
+      setLoading(true);
+
+      const url = editingReview
+        ? `${API_URL}/products/${productId}/reviews/${editingReview._id}`
+        : `${API_URL}/products/${productId}/reviews`;
+
+      const method = editingReview ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          rating: Number(rating),
           comment: comment.trim(),
           userName: user?.name || "Anonymous",
-        })
-      ).unwrap();
+        }),
+      });
 
-      if (result) {
+      const data = await response.json();
+
+      if (data.success) {
         toast.success(
           editingReview
             ? "Review updated successfully!"
-            : "Review submitted successfully!"
+            : "Review submitted successfully!",
         );
         // Reset form
         setRating(5);
         setComment("");
         setEditingReview(null);
-        // Refresh product
-        await dispatch(fetchSingleProduct(productId));
+        // Refresh product reviews
         if (onReviewSubmitted) onReviewSubmitted();
+        if (onReviewUpdated) onReviewUpdated();
+      } else {
+        toast.error(data.message || "Failed to submit review");
       }
     } catch (error) {
-      toast.error(error || "Failed to submit review");
+      console.error("Error submitting review:", error);
+      toast.error(error.message || "Failed to submit review");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -179,12 +201,12 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
           )}
           <button
             type="submit"
-            disabled={reviewLoading}
+            disabled={loading}
             className={`px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors ${
-              reviewLoading ? "opacity-50 cursor-not-allowed" : ""
+              loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {reviewLoading ? (
+            {loading ? (
               <span className="flex items-center gap-2">
                 <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                   <circle
