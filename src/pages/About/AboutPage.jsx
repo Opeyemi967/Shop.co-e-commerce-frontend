@@ -33,8 +33,8 @@ function About() {
               })}
               alt="About SHOP.CO"
               loading="lazy"
-              // FIXED: Changed static h-125 to responsive heights
-              className="rounded-3xl shadow-lg w-full h-64 md:h-80 lg:h-125 object-cover"
+              // FIXED: Used aspect-ratio to prevent stretching/overlapping on all screens
+              className="rounded-3xl shadow-lg w-full aspect-video md:aspect-4/3 lg:h-125 lg:w-auto object-cover"
             />
           </div>
 
