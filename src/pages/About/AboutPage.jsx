@@ -45,7 +45,7 @@ function About() {
             <span className="text-yellow-600 font-semibold text-sm uppercase tracking-wider">
               About Us
             </span>
-            <h1 className="text-5xl font-akira-super mt-2 mb-6">
+            <h1 className="text-3xl font-akira-super mt-2 mb-6">
               Redefining Fashion
               <br />
               <span className="text-yellow-600">For Everyone</span>
@@ -104,7 +104,7 @@ function About() {
           <span className="text-yellow-600 font-semibold text-sm uppercase tracking-wider">
             Our Values
           </span>
-          <h2 className="text-4xl font-akira-super mt-2">What We Stand For</h2>
+          <h2 className="text-3xl font-akira-super mt-2">What We Stand For</h2>
         </div>
 
         <div className="grid md:grid-cols-4 gap-8">
@@ -203,7 +203,7 @@ function About() {
       {/* ================================= */}
       <section className="max-w-7xl mx-auto px-6 py-16">
         <div className="bg-linear-to-r from-blue-50 to-purple-50 rounded-3xl p-12 text-center">
-          <h2 className="text-4xl font-akira-super mb-4">
+          <h2 className="text-3xl font-akira-super mb-4">
             Ready to Elevate Your Style?
           </h2>
           <p className="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">

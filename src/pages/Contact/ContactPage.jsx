@@ -66,7 +66,7 @@ function Contact() {
           <span className="text-yellow-600 font-semibold text-sm uppercase tracking-wider">
             Contact Us
           </span>
-          <h1 className="text-5xl font-akira-super mt-2 mb-6">
+          <h1 className="text-3xl font-akira-super mt-2 mb-6">
             We'd Love to Hear <br />
             <span className="text-yellow-600">From You</span>
           </h1>

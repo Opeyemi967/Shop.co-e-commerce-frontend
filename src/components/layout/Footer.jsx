@@ -110,10 +110,10 @@ const Footer = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
-              <h3 className="text-2xl font-bold text-white mb-2">
+              <h3 className="text-xl font-bold text-white mb-2">
                 Subscribe to Our Newsletter
               </h3>
-              <p className="text-gray-400">
+              <p className="text-gray-400 text-sm">
                 Get the latest updates on new products and upcoming sales
               </p>
             </div>
@@ -152,7 +152,7 @@ const Footer = () => {
             <Link
               to="/"
               onClick={scrollToTop}
-              className="text-2xl font-akira-super text-white inline-block mb-4"
+              className="text-xl font-akira-super text-white inline-block mb-4"
             >
               SHOP.CO
             </Link>

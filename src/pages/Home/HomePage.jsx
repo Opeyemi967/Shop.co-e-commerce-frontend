@@ -40,7 +40,7 @@ function HomePage() {
 
   const API_URL = "https://shop-co-e-commerce-backend.onrender.com/api/v1";
 
-  // ✅ Fetch products directly - NO REDUX
+  //  Fetch products directly - NO REDUX
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -66,7 +66,7 @@ function HomePage() {
     fetchProducts();
   }, []);
 
-  // ✅ Fetch top selling directly - NO REDUX
+  //  Fetch top selling directly - NO REDUX
   useEffect(() => {
     const fetchTopSelling = async () => {
       try {
@@ -187,7 +187,7 @@ function HomePage() {
       <section className="max-w-6xl mx-auto px-5 lg:px-0 py-16">
         <div className="grid lg:grid-cols-2 gap-10 items-center">
           <div>
-            <h1 className="font-akira-super text-5xl md:text-5xl lg:text-5xl font-bold mb-6">
+            <h1 className="font-akira-super text-3xl md:text-5xl lg:text-5xl font-bold mb-6">
               FIND CLOTHES
               <br />
               THAT MATCHES
@@ -245,7 +245,7 @@ function HomePage() {
       {/* ================================= */}
 
       <section className="max-w-6xl mx-auto px-5 py-20">
-        <h2 className="text-4xl font-akira-super text-center mb-12">
+        <h2 className="text-3xl font-akira-super text-center mb-12">
           NEW ARRIVALS
         </h2>
         <div className="grid md:grid-cols-4 gap-6">
@@ -268,7 +268,7 @@ function HomePage() {
       {/* ================================= */}
 
       <section className="max-w-6xl mx-auto px-5 py-20 border-t">
-        <h2 className="text-4xl font-akira-super text-center mb-12">
+        <h2 className="text-3xl font-akira-super text-center mb-12">
           TOP SELLING
         </h2>
         {renderTopSelling()}
@@ -288,7 +288,7 @@ function HomePage() {
 
       <section className="max-w-6xl mx-auto px-5 py-20">
         <div className="bg-[#F0F0F0] rounded-[40px] p-10">
-          <h2 className="text-4xl font-akira-super text-center mb-12">
+          <h2 className="text-3xl font-akira-super text-center mb-12">
             BROWSE BY DRESS STYLE
           </h2>
 
@@ -297,7 +297,7 @@ function HomePage() {
               to="/products?style=casual"
               className="bg-white rounded-[20px] p-8 h-62.5 relative overflow-hidden"
             >
-              <h3 className="text-3xl font-bold text-white z-10 relative">
+              <h3 className="text-2xl font-bold text-white z-10 relative">
                 Casual
               </h3>
               <img
@@ -311,7 +311,7 @@ function HomePage() {
               to="/products?style=formal"
               className="md:col-span-2 bg-white rounded-[20px] p-8 h-62.5 relative overflow-hidden"
             >
-              <h3 className="text-3xl font-bold text-white z-10 relative">
+              <h3 className="text-2xl font-bold text-white z-10 relative">
                 Formal
               </h3>
               <img
@@ -325,7 +325,7 @@ function HomePage() {
               to="/products?style=party"
               className="md:col-span-2 bg-white rounded-[20px] p-8 h-62.5 relative overflow-hidden"
             >
-              <h3 className="text-3xl font-bold text-white z-10 relative">
+              <h3 className="text-2xl font-bold text-white z-10 relative">
                 Party
               </h3>
               <img
@@ -339,7 +339,7 @@ function HomePage() {
               to="/products?style=gym"
               className="bg-white rounded-[20px] p-8 h-62.5 relative overflow-hidden"
             >
-              <h3 className="text-3xl font-bold text-white z-10 relative">
+              <h3 className="text-2xl font-bold text-white z-10 relative">
                 Gym
               </h3>
               <img

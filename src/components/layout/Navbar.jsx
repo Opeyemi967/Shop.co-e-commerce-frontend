@@ -109,7 +109,7 @@ function Navbar() {
         {/* ============================================================ */}
         <Link
           to="/"
-          className="text-2xl font-akira-super text-white hover:text-gray-300 transition-colors"
+          className="text-xl font-akira-super text-white hover:text-gray-300 transition-colors"
         >
           SHOP.CO
         </Link>
@@ -192,7 +192,7 @@ function Navbar() {
         <div className="flex md:hidden items-center space-x-4">
           {/* Mobile Cart Icon */}
           <Link to="/cart" className="relative">
-            <FiShoppingCart className="w-6 h-6 text-white hover:text-gray-300" />
+            <FiShoppingCart className="w-5 h-5 text-white hover:text-gray-300" />
 
             {/* Same logic for mobile - only show badge when logged in */}
             {isAuthenticated && totalItems > 0 && (

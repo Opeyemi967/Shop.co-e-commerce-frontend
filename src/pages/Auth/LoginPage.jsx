@@ -175,7 +175,7 @@ const LoginPage = () => {
         {/* Brand Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-block">
-            <h1 className="text-4xl font-akira-super text-gray-900">SHOP.CO</h1>
+            <h1 className="text-3xl font-akira-super text-gray-900">SHOP.CO</h1>
           </Link>
           <p className="text-gray-600 mt-2">
             {isLogin

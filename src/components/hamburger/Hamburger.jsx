@@ -50,7 +50,7 @@ const Hamburger = () => {
         className="md:hidden text-white hover:text-gray-300 focus:outline-none transition-colors duration-200 cursor-pointer"
         aria-label="Toggle menu"
       >
-        {isOpen ? <FiX className="w-8 h-8" /> : <FiMenu className="w-8 h-8" />}
+        {isOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
       </button>
 
       {/* ============================================================ */}
